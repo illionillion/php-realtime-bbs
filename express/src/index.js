@@ -11,17 +11,20 @@ const io = socketIo(server, {
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Not Found');
+// JSONのパースを追加
+app.use(express.json()); // これがないとPOSTリクエストのJSONがパースされない
+
+// /new_post へのPOSTリクエストを処理
+app.post('/new_post', (req, res) => {
+  // 受け取った投稿を全てのクライアントに送信
+  io.emit('new_post', req.body);
+  
+  res.status(200).json({ message: '送信成功' });
 });
 
+// Socket.ioの接続イベント
 io.on('connection', (socket) => {
   console.log('A user connected');
-  socket.on('new_post', (data) => {
-    console.log('New post received:', data);
-    io.emit('new_post', data); 
-  });
-
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });

@@ -1,24 +1,5 @@
 <?php
-// .env ファイルから環境変数を読み込む
-$databaseUrl = getenv('DATABASE_URL');  // DATABASE_URLを取得
-
-// DATABASE_URLから接続情報をパース
-$parsedUrl = parse_url($databaseUrl);
-
-$host = $parsedUrl['host'];
-$db = ltrim($parsedUrl['path'], '/');
-$user = $parsedUrl['user'];
-$pass = $parsedUrl['pass'];
-
-// PostgreSQLへの接続
-$dsn = "pgsql:host=$host;dbname=$db";
-try {
-    $pdo = new PDO($dsn, $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "接続失敗: " . $e->getMessage();
-    exit;
-}
+require_once("./lib/connect-db.php");
 
 // 投稿データを取得
 $stmt = $pdo->query('SELECT * FROM posts ORDER BY createdAt DESC');
@@ -27,33 +8,66 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <title>掲示板</title>
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
-    <script>
-        // Socket.io接続
-        const socket = io('<?= getenv('EXPRESS_URL'); ?>'); // ExpressサーバーのURL
-
-        socket.on('new_post', (data) => {
-            const postList = document.getElementById('posts');
-            const newPost = document.createElement('li');
-            newPost.textContent = `${data.name}: ${data.comment}`;
-            postList.prepend(newPost);  // 新しい投稿を先頭に追加
-        });
-    </script>
+    <?php require_once('./lib/bootstrap.php'); ?>
+    <?php require_once("./lib/socket.io.php"); ?>
 </head>
-<body>
-    <h1>掲示板</h1>
-    <ul id="posts">
-        <?php foreach ($posts as $post): ?>
-            <li><?= htmlspecialchars($post['name']) ?>: <?= htmlspecialchars($post['comment']) ?></li>
-        <?php endforeach; ?>
-    </ul>
-    <form action="send.php" method="POST">
-        <input type="text" name="name" placeholder="名前" required><br>
-        <textarea name="comment" placeholder="コメント" required></textarea><br>
-        <button type="submit">投稿</button>
-    </form>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-4"><i class="fas fa-comments"></i> 掲示板</h1>
+
+        <!-- 投稿フォーム -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-3"><i class="fas fa-pencil-alt"></i> 新規投稿</h2>
+                <form action="actions/send.php" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">名前</label>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="名前を入力" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">コメント</label>
+                        <textarea name="comment" id="comment" class="form-control" placeholder="コメントを入力" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane"></i> 投稿する
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 投稿リスト -->
+        <h2 class="h5 mb-3"><i class="fas fa-list"></i> 投稿一覧</h2>
+        <ul id="posts" class="list-group mb-4">
+            <?php foreach ($posts as $post): ?>
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($post['name']) ?></strong>
+                            <p class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></p>
+                        </div>
+                        <small class="text-muted"><i class="far fa-clock"></i> <?= htmlspecialchars($post['createdat']) ?></small>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <template id="post-template">
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong><i class="fas fa-user-circle"></i> <span class="post-name"></span></strong>
+                    <p class="mb-1 post-comment"></p>
+                </div>
+                <small class="text-muted"><i class="far fa-clock"></i> <span class="post-createdat"></span></small>
+            </div>
+        </li>
+    </template>
+
 </body>
+
 </html>
