@@ -26,11 +26,11 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="h5 mb-3"><i class="fas fa-pencil-alt"></i> 新規投稿</h2>
                 <form action="actions/send.php" method="POST">
                     <div class="mb-3">
-                        <label for="name" class="form-label">名前</label>
+                        <label for="name" class="form-label w-100">名前</label>
                         <input type="text" name="name" id="name" class="form-control" placeholder="名前を入力" required>
                     </div>
                     <div class="mb-3">
-                        <label for="comment" class="form-label">コメント</label>
+                        <label for="comment" class="form-label w-100">コメント</label>
                         <textarea name="comment" id="comment" class="form-control" placeholder="コメントを入力" rows="4" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
@@ -48,7 +48,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($post['name']) ?></strong>
-                            <p class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></p>
+                            <pre class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></pre>
                         </div>
                         <small class="text-muted"><i class="far fa-clock"></i> <?= htmlspecialchars($post['createdat']) ?></small>
                     </div>
@@ -61,7 +61,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <strong><i class="fas fa-user-circle"></i> <span class="post-name"></span></strong>
-                    <p class="mb-1 post-comment"></p>
+                    <pre class="mb-1 post-comment"></pre>
                 </div>
                 <small class="text-muted"><i class="far fa-clock"></i> <span class="post-createdat"></span></small>
             </div>
