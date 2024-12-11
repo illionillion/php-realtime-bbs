@@ -9,19 +9,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare('
         INSERT INTO posts (name, comment) 
         VALUES (:name, :comment) 
-        RETURNING createdAt
+        RETURNING name, comment, createdAt
     ');
     $stmt->execute(['name' => $name, 'comment' => $comment]);
 
-    // 追加した投稿の作成日時（createdAt）を取得
-    $createdAt = $stmt->fetchColumn();  // RETURNING句で返されたcreatedAtを取得
+    // 追加した投稿の情報（name, comment, createdAt）を取得
+    $postData = $stmt->fetch(PDO::FETCH_ASSOC);  // 連想配列として取得
 
     // Socket.ioサーバーに新しい投稿を通知
     $url = "http://express:3000/new_post";
     $data = json_encode([
-        'name' => $name, 
-        'comment' => $comment, 
-        'createdat' => $createdAt // 投稿時刻をそのまま送信
+        'name' => htmlspecialchars($postData['name']), 
+        'comment' => htmlspecialchars($postData['comment']), 
+        'createdat' => $postData['createdat'] // 投稿時刻をそのまま送信
     ]);
 
     $ch = curl_init($url);
