@@ -48,7 +48,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($post['name']) ?></strong>
-                            <pre class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></pre>
+                            <pre class="mb-1"><?= htmlspecialchars($post['comment']) ?></pre>
                         </div>
                         <small class="text-muted"><i class="far fa-clock"></i> <?= htmlspecialchars($post['createdat']) ?></small>
                     </div>
