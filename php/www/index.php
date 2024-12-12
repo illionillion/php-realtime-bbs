@@ -50,7 +50,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($post['name']) ?></strong>
                             <pre class="mb-1"><?= htmlspecialchars($post['comment']) ?></pre>
                         </div>
-                        <small class="text-muted"><i class="far fa-clock"></i> <?= htmlspecialchars($post['createdat']) ?></small>
+                        <small class="text-muted"><i class="far fa-clock"></i>  <?= date('Y/m/d H:i', strtotime($post['createdat'])) ?></small>
                     </div>
                 </li>
             <?php endforeach; ?>

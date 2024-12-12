@@ -12,6 +12,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - EXPRESS_URL=${EXPRESS_URL}
+      - TZ=Asia/Tokyo
   express:
     container_name: express
     build: ./express

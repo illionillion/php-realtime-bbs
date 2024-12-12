@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_encode([
         'name' => htmlspecialchars($postData['name']), 
         'comment' => htmlspecialchars($postData['comment']), 
-        'createdat' => $postData['createdat'] // 投稿時刻をそのまま送信
+        'createdat' => date('Y/m/d H:i', strtotime($postData['createdat'])) // 投稿時刻をそのまま送信
     ]);
 
     $ch = curl_init($url);
