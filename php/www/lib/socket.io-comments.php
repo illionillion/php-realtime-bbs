@@ -11,7 +11,7 @@
 
     // 新しい投稿を受け取ったときの処理
     socket.on('new_comment', (data) => {
-        console.log('新しい投稿を受信しました:', data);
+        // console.log('新しい投稿を受信しました:', data);
         
         addNewPost(data);
     });
@@ -27,7 +27,7 @@
         // 各要素にデータを挿入
         clone.querySelector('.comment-name').textContent = data.name;
         clone.querySelector('.comment-comment').textContent = data.comment;
-        clone.querySelector('.comment-date').textContent = data.createdAt;
+        clone.querySelector('.comment-createdat').textContent = data.createdAt;
 
         // 投稿リストの先頭に追加
         const postList = document.getElementById('comments');

@@ -5,8 +5,6 @@
 
     // 新しい投稿を受け取ったときの処理
     socket.on('new_room', (data) => {
-        console.log(data);
-        
         addNewPost(data);
     });
 
