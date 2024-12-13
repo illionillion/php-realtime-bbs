@@ -29,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_exec($ch);
     curl_close($ch);
 
-    header('Location: ../index.php');
-    exit;
 }
+header('Location: ../index.php');
 ?>

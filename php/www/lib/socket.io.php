@@ -19,7 +19,7 @@
         const clone = template.content.cloneNode(true); // テンプレートを複製
 
         // 名前、コメント、時刻を動的に設定
-        clone.querySelector('.room-link').href = `/rooms/${data.roomId}`;
+        clone.querySelector('.room-link').href = `/rooms?id=${data.roomId}`;
         clone.querySelector('.title').textContent = data.title;
         clone.querySelector('.desc').textContent = `（作成者: ${data.createdBy}, ${data.createdAt}）`;
 

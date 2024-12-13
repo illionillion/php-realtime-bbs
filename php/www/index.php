@@ -26,11 +26,11 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="h5 mb-3"><i class="fas fa-pencil-alt"></i> スレッド作成</h2>
                 <form action="actions/create-room.php" method="POST">
                     <div class="mb-3">
-                        <label for="title" class="form-label">スレッドのタイトル</label>
+                        <label for="title" class="form-label w-100">スレッドのタイトル</label>
                         <input type="text" name="title" id="title" class="form-control" placeholder="スレッドのタイトルを入力" required>
                     </div>
                     <div class="mb-3">
-                        <label for="createdBy" class="form-label">作成者名</label>
+                        <label for="createdBy" class="form-label w-100">作成者名</label>
                         <input type="text" name="createdBy" id="createdBy" class="form-control" placeholder="作成者の名前を入力" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
@@ -45,7 +45,7 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <ul id="rooms" class="list-group mb-4">
             <?php foreach ($rooms as $room): ?>
                 <li class="list-group-item">
-                    <a href="/rooms/<?= htmlspecialchars($room['roomid']) ?>" class="room-link text-decoration-none">
+                    <a href="/rooms?id=<?= htmlspecialchars($room['roomid']) ?>" class="room-link text-decoration-none">
                         <strong class="title"><?= htmlspecialchars($room['title']) ?></strong>
                         <small class="desc text-muted">（作成者: <?= htmlspecialchars($room['createdby']) ?>, <?= date('Y/m/d H:i', strtotime($room['createdat'])) ?>）</small>
                     </a>
@@ -54,6 +54,7 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ul>
     </div>
 
+    <!-- Socket.ioで後から追加する用 -->
     <template id="room-template">
         <li class="list-group-item">
             <a href="" class="room-link text-decoration-none">
