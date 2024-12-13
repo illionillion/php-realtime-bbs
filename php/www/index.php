@@ -1,9 +1,9 @@
 <?php
 require_once("./lib/connect-db.php");
 
-// 投稿データを取得
-$stmt = $pdo->query('SELECT * FROM posts ORDER BY createdAt DESC');
-$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// ルームのデータを取得
+$stmt = $pdo->query('SELECT * FROM rooms ORDER BY createdAt DESC');
+$rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -11,63 +11,57 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
-    <title>掲示板</title>
+    <title>掲示板一覧</title>
     <?php require_once('./lib/bootstrap.php'); ?>
     <?php require_once("./lib/socket.io.php"); ?>
 </head>
 
 <body class="bg-light">
     <div class="container py-5">
-        <h1 class="text-center mb-4"><i class="fas fa-comments"></i> 掲示板</h1>
+        <h1 class="text-center mb-4"><i class="fas fa-comments"></i> 掲示板一覧</h1>
 
-        <!-- 投稿フォーム -->
+        <!-- ルーム作成フォーム -->
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <h2 class="h5 mb-3"><i class="fas fa-pencil-alt"></i> 新規投稿</h2>
-                <form action="actions/send.php" method="POST">
+                <h2 class="h5 mb-3"><i class="fas fa-pencil-alt"></i> スレッド作成</h2>
+                <form action="actions/create-room.php" method="POST">
                     <div class="mb-3">
-                        <label for="name" class="form-label w-100">名前</label>
-                        <input type="text" name="name" id="name" class="form-control" placeholder="名前を入力" required>
+                        <label for="title" class="form-label">スレッドのタイトル</label>
+                        <input type="text" name="title" id="title" class="form-control" placeholder="スレッドのタイトルを入力" required>
                     </div>
                     <div class="mb-3">
-                        <label for="comment" class="form-label w-100">コメント</label>
-                        <textarea name="comment" id="comment" class="form-control" placeholder="コメントを入力" rows="4" required></textarea>
+                        <label for="createdBy" class="form-label">作成者名</label>
+                        <input type="text" name="createdBy" id="createdBy" class="form-control" placeholder="作成者の名前を入力" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-paper-plane"></i> 投稿する
+                        <i class="fas fa-paper-plane"></i> 作成する
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- 投稿リスト -->
-        <h2 class="h5 mb-3"><i class="fas fa-list"></i> 投稿一覧</h2>
-        <ul id="posts" class="list-group mb-4">
-            <?php foreach ($posts as $post): ?>
+        <!-- ルーム一覧 -->
+        <h2 class="h5 mb-3"><i class="fas fa-list"></i> スレッド一覧</h2>
+        <ul id="rooms" class="list-group mb-4">
+            <?php foreach ($rooms as $room): ?>
                 <li class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($post['name']) ?></strong>
-                            <pre class="mb-1"><?= htmlspecialchars($post['comment']) ?></pre>
-                        </div>
-                        <small class="text-muted"><i class="far fa-clock"></i>  <?= date('Y/m/d H:i', strtotime($post['createdat'])) ?></small>
-                    </div>
+                    <a href="/rooms/<?= htmlspecialchars($room['roomid']) ?>" class="room-link text-decoration-none">
+                        <strong class="title"><?= htmlspecialchars($room['title']) ?></strong>
+                        <small class="desc text-muted">（作成者: <?= htmlspecialchars($room['createdby']) ?>, <?= date('Y/m/d H:i', strtotime($room['createdat'])) ?>）</small>
+                    </a>
                 </li>
             <?php endforeach; ?>
         </ul>
     </div>
-    <template id="post-template">
+
+    <template id="room-template">
         <li class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong><i class="fas fa-user-circle"></i> <span class="post-name"></span></strong>
-                    <pre class="mb-1 post-comment"></pre>
-                </div>
-                <small class="text-muted"><i class="far fa-clock"></i> <span class="post-createdat"></span></small>
-            </div>
+            <a href="" class="room-link text-decoration-none">
+                <strong class="title"></strong>
+                <small class="desc text-muted"></small>
+            </a>
         </li>
     </template>
-
 </body>
 
 </html>

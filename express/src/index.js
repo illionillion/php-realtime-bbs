@@ -14,10 +14,10 @@ const io = socketIo(server, {
 // JSONのパースを追加
 app.use(express.json()); // これがないとPOSTリクエストのJSONがパースされない
 
-// /new_post へのPOSTリクエストを処理
-app.post('/new_post', (req, res) => {
+// /new_room へのPOSTリクエストを処理
+app.post('/new_room', (req, res) => {
   // 受け取った投稿を全てのクライアントに送信
-  io.emit('new_post', req.body);
+  io.emit('new_room', req.body);
   
   res.status(200).json({ message: '送信成功' });
 });
