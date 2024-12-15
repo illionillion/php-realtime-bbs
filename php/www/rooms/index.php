@@ -1,6 +1,6 @@
 <?php
 require_once("../lib/connect-db.php");
-require_once("../lib/sessioin-check.php");
+require_once("../lib/session-check.php");
 
 // URLからルームIDを取得
 $roomId = $_GET['id'] ?? null;
@@ -10,8 +10,13 @@ if (!$roomId) {
     exit;
 }
 
-// ルームのデータを取得
-$stmt = $pdo->prepare('SELECT * FROM rooms WHERE roomid = :roomid');
+// ルームのデータを取得 (作成者のdisplayNameも一緒に取得)
+$stmt = $pdo->prepare('
+    SELECT rooms.*, users.displayname as createdby
+    FROM rooms 
+    LEFT JOIN users ON rooms.userid = users.id
+    WHERE roomid = :roomid
+');
 $stmt->execute([':roomid' => $roomId]);
 $room = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -20,8 +25,14 @@ if (!$room) {
     exit;
 }
 
-// コメントを取得
-$stmt = $pdo->prepare('SELECT * FROM posts WHERE roomid = :roomid ORDER BY createdAt DESC');
+// コメントを取得し、投稿者のdisplayNameを取得
+$stmt = $pdo->prepare('
+    SELECT posts.*, users.displayname as commenter_name
+    FROM posts
+    LEFT JOIN users ON posts.userid = users.id
+    WHERE roomid = :roomid
+    ORDER BY createdAt DESC
+');
 $stmt->execute([':roomid' => $roomId]);
 $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -48,16 +59,15 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p><strong>作成者:</strong> <?= htmlspecialchars($room['createdby']) ?></p>
         <p><strong>作成日時:</strong> <?= date('Y/m/d H:i', strtotime($room['createdat'])) ?></p>
 
-        <!-- ここにコメント機能などを追加 -->
+        <!-- コメント機能などを追加 -->
         <h2 class="h5"><i class="fas fa-comment"></i> コメント</h2>
         <!-- コメント一覧表示 -->
         <ul id="comments" class="list-group mb-4">
-            <!-- コメント一覧をここに表示 -->
             <?php foreach ($comments as $comment): ?>
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($comment['name']) ?></strong>
+                            <strong><i class="fas fa-user-circle"></i> <?= htmlspecialchars($comment['commenter_name']) ?></strong>
                             <pre class="mb-1"><?= htmlspecialchars($comment['comment']) ?></pre>
                         </div>
                         <small class="text-muted"><i class="far fa-clock"></i> <?= date('Y/m/d H:i', strtotime($comment['createdat'])) ?></small>
@@ -69,13 +79,13 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <form action="/actions/post-comment.php" method="POST">
             <input type="hidden" name="roomid" value="<?= htmlspecialchars($roomId) ?>">
             <div class="mb-3">
-                <label for="name" class="form-label w-100">名前</label>
-                <input type="text" name="name" id="name" class="form-control" placeholder="あなたの名前を入力してください" required>
-            </div>
-            <div class="mb-3">
                 <label for="comment" class="form-label w-100">コメント</label>
                 <textarea name="comment" id="comment" class="form-control" rows="3" placeholder="コメントを入力してください" required></textarea>
             </div>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-paper-plane"></i> コメントを送信
             </button>

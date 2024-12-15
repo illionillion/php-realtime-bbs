@@ -1,9 +1,14 @@
 <?php
 require_once("./lib/connect-db.php");
-require_once("./lib/sessioin-check.php");
+require_once("./lib/session-check.php");
 
 // ルームのデータを取得
-$stmt = $pdo->query('SELECT * FROM rooms ORDER BY createdAt DESC');
+$stmt = $pdo->query('
+    SELECT rooms.*, users.displayname AS createdBy 
+    FROM rooms 
+    JOIN users ON rooms.userId = users.id 
+    ORDER BY rooms.createdAt DESC
+');
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -31,10 +36,11 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <label for="title" class="form-label w-100">スレッドのタイトル</label>
                         <input type="text" name="title" id="title" class="form-control" placeholder="スレッドのタイトルを入力" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="createdBy" class="form-label w-100">作成者名</label>
-                        <input type="text" name="createdBy" id="createdBy" class="form-control" placeholder="作成者の名前を入力" required>
-                    </div>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
+
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-paper-plane"></i> 作成する
                     </button>

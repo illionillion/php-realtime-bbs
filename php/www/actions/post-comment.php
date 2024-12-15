@@ -1,22 +1,31 @@
 <?php
 require_once("../lib/connect-db.php");
-require_once("../lib/sessioin-check.php");
+require_once("../lib/session-check.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $roomId = $_POST['roomid'];
-    $name = $_POST['name'];
-    $comment = $_POST['comment'];
+    $roomId = $_POST['roomid'] ?? null;
+    $comment = trim($_POST['comment'] ?? '');
+
+    // セッションからユーザーIDを取得
+    $userId = $_SESSION['user_id'] ?? null;
+    $displayName = $_SESSION['user_displayName'] ?? null; // ユーザー名も取得
+    
+    if (!$roomId || empty($comment)) {
+        $_SESSION['error'] = 'コメントは必須です。';
+        header("Location: ../rooms/index.php?id=" . urlencode($roomId));
+        exit();
+    }
 
     // データベースに投稿を保存
-    $stmt = $pdo->prepare('INSERT INTO posts (roomId, name, comment) VALUES (:roomId, :name, :comment) RETURNING roomId, name, comment, createdAt');
-    $stmt->execute(['roomId' => $roomId, 'name' => $name, 'comment' => $comment]);
+    $stmt = $pdo->prepare('INSERT INTO posts (roomId, userId, comment) VALUES (:roomId, :userId, :comment) RETURNING roomId, userId, comment, createdAt');
+    $stmt->execute(['roomId' => $roomId, 'userId' => $userId, 'comment' => $comment]);
     $postData = $stmt->fetch(PDO::FETCH_ASSOC); // 投稿データを取得
 
     // Socket.io サーバーに新しい投稿を通知
     $url = "http://express:3000/new_comment";
     $data = json_encode([
         'roomId' => htmlspecialchars($postData['roomid']),
-        'name' => htmlspecialchars($postData['name']),
+        'name' => htmlspecialchars($displayName),
         'comment' => htmlspecialchars($postData['comment']),
         'createdAt' => date('Y/m/d H:i', strtotime($postData['createdat']))
     ]);
