@@ -1,5 +1,6 @@
 <?php
 require_once("../lib/connect-db.php");
+require_once("../lib/sessioin-check.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $roomId = $_POST['roomid'];

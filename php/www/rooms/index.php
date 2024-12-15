@@ -1,5 +1,6 @@
 <?php
 require_once("../lib/connect-db.php");
+require_once("../lib/sessioin-check.php");
 
 // URLからルームIDを取得
 $roomId = $_GET['id'] ?? null;
@@ -37,6 +38,7 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body class="bg-light">
     <div class="container py-5">
+        <div class="d-flex w-100 justify-content-end"><a href="/actions/auth-signout.php" class="btn btn-dark">サインアウト</a></div>
         <h1 class="text-center mb-4"><i class="fas fa-comments"></i> <?= htmlspecialchars($room['title']) ?></h1>
 
         <div>
