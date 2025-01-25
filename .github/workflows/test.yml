@@ -39,13 +39,7 @@ jobs:
       # DBの準備完了を待つ
       - name: Wait for database
         run: |
-          docker compose exec -T db bash -c \
-            'while ! pg_isready -U johndoe -d mydb; do sleep 1; done'
-      
-      # マイグレーションの実行
-      - name: Run database migrations
-        run: |
-          docker compose exec -T db psql -U johndoe -d mydb -f /docker-entrypoint-initdb.d/migrate.sql
+          timeout 30 bash -c 'until docker compose exec -T db pg_isready -U johndoe -d mydb; do sleep 1; done'
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
