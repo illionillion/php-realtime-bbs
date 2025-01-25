@@ -31,3 +31,18 @@ docker compose up -d
 ```sh
 docker compose down
 ```
+
+テスト実行
+
+`docker compose up -d`で起動した状態で以下を実行
+
+```sh
+# テスト用のディレクトリに移動
+cd playwright
+# テスト用のパッケージをインストール    
+npm i
+# playwrightのパッケージをインストール
+npm run test:install
+# テストを実行
+npm run test
+```
