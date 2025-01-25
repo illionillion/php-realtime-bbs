@@ -21,7 +21,7 @@ jobs:
           EXPRESS_PORT=3000
           EXPRESS_URL=http://localhost:3000
           CORS_URL=http://localhost
-          DB_REPLICAS=0
+          DB_REPLICAS=1
           EOF
       
       - name: Set up Docker Buildx
@@ -37,16 +37,9 @@ jobs:
         run: docker compose up -d
       
       # DBの準備完了を待つ
-      - name: Check database connection
+      - name: Wait for database
         run: |
-          # コンテナの状態確認
-          docker compose ps
-          
-          # DBコンテナのログを確認
-          docker compose logs db
-          
-          # 実際にクエリを実行してみる
-          docker compose exec -T db psql -U johndoe -d mydb -c '\dt'
+          timeout 30 bash -c 'until docker compose exec -T db pg_isready -h localhost -U johndoe -d mydb -p 5432; do sleep 1; done'
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
