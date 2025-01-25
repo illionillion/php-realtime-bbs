@@ -49,7 +49,16 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body class="bg-light">
     <div class="container py-5">
-        <div class="d-flex w-100 justify-content-end"><a href="/actions/auth-signout.php" class="btn btn-dark">サインアウト</a></div>
+        <div class="d-flex w-100 justify-content-end">
+            <!-- 縦並び -->
+            <div class="d-flex flex-column">
+                <!-- ユーザー情報表示 -->
+                <?php if (isset($_SESSION['user_displayName'])): ?>
+                    <p class="text-muted">サインイン中: <?= htmlspecialchars($_SESSION['user_displayName']) ?></p>
+                <?php endif; ?>
+                <a href="/actions/auth-signout.php" class="btn btn-dark">サインアウト</a>
+            </div>
+        </div>
         <h1 class="text-center mb-4"><i class="fas fa-comments"></i> <?= htmlspecialchars($room['title']) ?></h1>
 
         <div>
