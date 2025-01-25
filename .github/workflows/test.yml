@@ -36,6 +36,17 @@ jobs:
       - name: Start containers
         run: docker compose up -d
       
+      # DBの準備完了を待つ
+      - name: Wait for database
+        run: |
+          docker compose exec -T db bash -c \
+            'while ! pg_isready -U johndoe -d mydb; do sleep 1; done'
+      
+      # マイグレーションの実行
+      - name: Run database migrations
+        run: |
+          docker compose exec -T db psql -U johndoe -d mydb -f /docker-entrypoint-initdb.d/migrate.sql
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -53,6 +64,8 @@ jobs:
         run: |
           # PHPサーバーが立ち上がるまで待機
           timeout 30 bash -c 'while ! curl -s http://localhost:80 > /dev/null; do sleep 1; done'
+          # 少し待機して各サービスの準備完了を確実に
+          sleep 5
       
       - name: Run Playwright tests
         working-directory: playwright
