@@ -39,7 +39,7 @@ jobs:
       # DBの準備完了を待つ
       - name: Wait for database
         run: |
-          timeout 30 bash -c 'until docker compose exec -T db pg_isready -U johndoe -d mydb; do sleep 1; done'
+          timeout 30 bash -c 'until docker compose exec -T db pg_isready -h localhost -U johndoe -d mydb -p 5432; do sleep 1; done'
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
