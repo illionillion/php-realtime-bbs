@@ -37,9 +37,16 @@ jobs:
         run: docker compose up -d
       
       # DBの準備完了を待つ
-      - name: Wait for database
+      - name: Check database connection
         run: |
-          timeout 30 bash -c 'until docker compose exec -T db pg_isready -h localhost -U johndoe -d mydb -p 5432; do sleep 1; done'
+          # コンテナの状態確認
+          docker compose ps
+          
+          # DBコンテナのログを確認
+          docker compose logs db
+          
+          # 実際にクエリを実行してみる
+          docker compose exec -T db psql -U johndoe -d mydb -c '\dt'
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
