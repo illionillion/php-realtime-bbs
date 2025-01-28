@@ -29,7 +29,7 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="d-flex flex-column">
                 <!-- ユーザー情報表示 -->
                 <?php if (isset($_SESSION['user_displayName'])): ?>
-                    <p class="text-muted">サインイン中: <?= htmlspecialchars($_SESSION['user_displayName']) ?></p>
+                    <p class="text-muted">サインイン中: <span class="fw-bold"><?= htmlspecialchars($_SESSION['user_displayName']) ?></span></p>
                 <?php endif; ?>
                 <a href="/actions/auth-signout.php" class="btn btn-dark">サインアウト</a>
             </div>

@@ -62,7 +62,9 @@ test.describe('認証フロー', () => {
     await expect(page).toHaveURL('/');
     
     // ヘッダーにユーザー名が表示されていることを確認
-    await expect(page.getByText(testUser.displayName)).toBeVisible();
+    await expect(
+      page.getByText(`サインイン中: ${testUser.displayName}`)
+    ).toBeVisible();
 
     // ログアウト
     await page.getByRole('link', { name: 'サインアウト' }).click();
