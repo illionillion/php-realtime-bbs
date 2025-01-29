@@ -16,6 +16,11 @@ test.describe('スレッド機能', () => {
     await page.getByLabel('メールアドレス').fill(testUser.email);
     await page.getByLabel('パスワード').fill(testUser.password);
     await page.getByRole('button', { name: 'サインアップ' }).click();
+    
+    // リダイレクトとページ読み込みを待機
+    await page.waitForURL('/');
+    await page.waitForLoadState('networkidle');
+    
     await expect(page).toHaveURL('/');
   });
 
@@ -47,8 +52,13 @@ test.describe('スレッド機能', () => {
   });
 
   test.afterEach(async ({ page }) => {
-    // ログアウト
+    // ログアウト前にページが安定するのを待機
+    await page.waitForLoadState('networkidle');
+    
     await page.getByRole('link', { name: 'サインアウト' }).click();
+    
+    // ログアウト後のリダイレクトを待機
+    await page.waitForURL('/auth/');
     await expect(page).toHaveURL('/auth/');
   });
 }); 
