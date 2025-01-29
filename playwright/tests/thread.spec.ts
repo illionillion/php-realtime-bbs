@@ -15,12 +15,18 @@ test.describe('スレッド機能', () => {
     await page.getByLabel('表示名').fill(testUser.displayName);
     await page.getByLabel('メールアドレス').fill(testUser.email);
     await page.getByLabel('パスワード').fill(testUser.password);
-    await page.getByRole('button', { name: 'サインアップ' }).click();
     
-    // リダイレクトとページ読み込みを待機
-    await page.waitForURL('/');
+    // サインアップボタンをクリックする前にフォームが完全に読み込まれるのを待つ
     await page.waitForLoadState('networkidle');
-    
+    await page.getByRole('button', { name: 'サインアップ' }).click();
+
+    // より具体的な条件で待機
+    await Promise.all([
+      page.waitForURL('/'),
+      page.waitForLoadState('networkidle'),
+      page.waitForSelector('text=サインアウト'), // サインアウトリンクが表示されるまで待機
+    ]);
+
     await expect(page).toHaveURL('/');
   });
 
@@ -52,13 +58,26 @@ test.describe('スレッド機能', () => {
   });
 
   test.afterEach(async ({ page }) => {
-    // ログアウト前にページが安定するのを待機
-    await page.waitForLoadState('networkidle');
-    
-    await page.getByRole('link', { name: 'サインアウト' }).click();
-    
-    // ログアウト後のリダイレクトを待機
-    await page.waitForURL('/auth/');
-    await expect(page).toHaveURL('/auth/');
+    try {
+      // サインアウトリンクが表示されるまで待機
+      await page.waitForSelector('text=サインアウト', { timeout: 20000 });
+      await page.waitForLoadState('networkidle');
+      
+      // サインアウト処理
+      const signoutLink = await page.getByRole('link', { name: 'サインアウト' });
+      await signoutLink.waitFor({ state: 'visible' });
+      await signoutLink.click();
+
+      // ログアウト後の遷移を待機
+      await Promise.all([
+        page.waitForURL('/auth/'),
+        page.waitForLoadState('networkidle'),
+      ]);
+
+      await expect(page).toHaveURL('/auth/');
+    } catch (error) {
+      console.error('ログアウト処理でエラー:', error);
+      throw error;
+    }
   });
 }); 

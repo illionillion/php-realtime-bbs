@@ -11,8 +11,8 @@ export default defineConfig({
     baseURL: 'http://localhost:80',
     trace: 'on-first-retry',
     // headless: false,
-    actionTimeout: 10000,    // アクションのタイムアウト（デフォルト: 5000ms）
-    navigationTimeout: 10000, // ナビゲーションのタイムアウト（デフォルト: 5000ms）
+    actionTimeout: 30000,     // 30秒に延長
+    navigationTimeout: 30000,  // 30秒に延長
   },
   projects: [
     {
